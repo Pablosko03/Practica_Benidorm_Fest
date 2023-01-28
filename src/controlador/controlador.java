@@ -9,6 +9,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
+import modelo.Votacion;
 import vista.vista;
 
 public class controlador implements ActionListener{
@@ -23,10 +24,14 @@ public class controlador implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
+		int numVotos = 0;
 		controlador helper = new controlador(vista);
 		try {
+			
 			if(e.getSource() == this.vista.btnNewButton) {
 				helper.createConnection();
+				
+				votacion(numVotos);
 			}
 			
 		} catch (ClassNotFoundException | SQLException | IOException e1) {
@@ -34,6 +39,18 @@ public class controlador implements ActionListener{
 			e1.printStackTrace();
 		}
 		
+	}
+
+	public void votacion(int numVotos) {
+		//Repetimos el for segun el numero de votos por porcentaje de rango
+		String rango = "";
+		for(int i = 0; i< numVotos; i++) {
+			//Creacion del hilo de prueba
+			Votacion hilo = new Votacion(rango);
+		
+			//Recuperamos el voto que ha salido del numero random que calcula el hilo
+			int voto = hilo.getVoto();
+		}
 	}
 
 	public static Connection createConnection() throws ClassNotFoundException, SQLException, IOException {
