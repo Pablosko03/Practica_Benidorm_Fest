@@ -6,6 +6,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Properties;
 
@@ -39,6 +41,93 @@ public class controlador implements ActionListener{
 			e1.printStackTrace();
 		}
 		
+	}
+	
+	//Metodo para sacar las votaciones de andalucia 
+	//(Es un comienzo para ver como vamos a hacerlo)
+	public void votacionAndalucia(Connection connection, String rango) throws SQLException {
+		ResultSet resultSet = null;
+		PreparedStatement preparedStatement = null;
+		int porcentajeVoto, porcentajeRango, numVotosFinal, totalHabitantes;
+		
+		try {
+			
+			preparedStatement = connection.prepareStatement("SELECT ? FROM PORCENTAJES_RANGOEDAD WHERE NOMBRE_COMUNIDAD = ?");
+			preparedStatement.setString(1, rango);
+			preparedStatement.setString(2, "Andalucia");
+			
+			resultSet = preparedStatement.executeQuery();
+			
+			porcentajeVoto = resultSet.getInt(rango);
+			
+			porcentajeRango = votacionRango(connection, rango);
+			
+			
+			//Cambiar el String andalucia por una variable que cambie de comunidad
+			totalHabitantes = habitantesComunidad(connection, "Andalucia");
+			
+			porcentajeVoto = (totalHabitantes * porcentajeVoto)/100;
+			
+			numVotosFinal = (porcentajeVoto * porcentajeRango)/100;
+			
+			votacion(numVotosFinal);
+					
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw e;
+		}finally {
+			if (null != preparedStatement) {
+				try {
+					preparedStatement.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				
+					}
+				}
+		}
+	}
+	
+	public int habitantesComunidad(Connection connection, String comunidad) throws SQLException {
+		ResultSet resultSet = null;
+		PreparedStatement preparedStatement = null;
+		int totalHabitantes;
+		
+		try {
+			
+			preparedStatement = connection.prepareStatement("SELECT TOTAL_HABITANTES FROM PORCENTAJES_RANGOEDAD WHERE NOMBRE_COMUNIDAD = ?");
+			preparedStatement.setString(1, comunidad);
+			
+			resultSet = preparedStatement.executeQuery();
+			
+			totalHabitantes = resultSet.getInt("TOTAL_HABITANTES");
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw e;
+		}
+		return totalHabitantes;
+	}
+	
+	public int votacionRango(Connection connection, String rango) throws SQLException{
+		ResultSet resultSet = null;
+		PreparedStatement preparedStatement = null;
+		int porcentajeVoto;
+		
+		try {
+			
+			preparedStatement = connection.prepareStatement("SELECT PORCENTAJE FROM PORCENTAJE_VOTACION_RANGO WHERE RANGO = ?");
+			preparedStatement.setString(1, rango);
+			
+			resultSet = preparedStatement.executeQuery();
+			
+			porcentajeVoto = resultSet.getInt(rango);
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw e;
+		}
+		
+		return porcentajeVoto;
 	}
 
 	public void votacion(int numVotos) {
