@@ -9,31 +9,33 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Properties;
 
-import modelo.Votacion;
-import vista.vista;
+import modelo.*;
+import vista.Vista;
 
 public class controlador implements ActionListener{
 
-	vista vista = new vista();
+	Vista Vista = new Vista();
 	
-	public controlador(vista vista) {
-		this.vista = vista;
-		this.vista.btnNewButton.addActionListener(this);
+	public controlador(Vista Vista) {
+		this.Vista = Vista;
+		this.Vista.botonInicio.addActionListener(this);
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 		int numVotos = 0;
-		controlador helper = new controlador(vista);
+		controlador helper = new controlador(Vista);
 		try {
+			Connection connection = helper.createConnection();
 			
-			if(e.getSource() == this.vista.btnNewButton) {
-				helper.createConnection();
+			if(e.getSource() == this.Vista.botonInicio) {
 				
-				votacion(numVotos);
+				procesarComunidadVoto(connection);
+//				votacionAndalucia(connection, "");
 			}
 			
 		} catch (ClassNotFoundException | SQLException | IOException e1) {
@@ -43,9 +45,97 @@ public class controlador implements ActionListener{
 		
 	}
 	
-	//Metodo para sacar las votaciones de andalucia 
-	//(Es un comienzo para ver como vamos a hacerlo)
-	public void votacionAndalucia(Connection connection, String rango) throws SQLException {
+	public void procesarComunidadVoto(Connection connection) {
+		ArrayList<String> comunidades = new ArrayList<String>();
+		ArrayList<String> rangos = new ArrayList<String>();
+		
+		String comunidad;
+		String rango;
+		
+		try {
+			
+			comunidades = sacarComunidad(connection, comunidades);
+			rangos = sacarRango(connection, rangos);
+			
+			for(int i = 0; i<comunidades.size(); i++) {
+				for(int j = 0; j<rangos.size(); j++) {
+					comunidad = comunidades.get(i);
+					rango = rangos.get(j);
+					
+					votacionComunidades(connection, rango, comunidad);
+				}
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public ArrayList<String> sacarComunidad(Connection connection, ArrayList<String> comunidades) throws SQLException{
+		ResultSet resultSet = null;
+		PreparedStatement preparedStatement = null;
+		
+		try {
+			
+			preparedStatement = connection.prepareStatement("SELECT NOMBRE_COMUNIDAD FROM PORCENTAJES_RANGOEDAD");
+			
+			resultSet = preparedStatement.executeQuery();
+			
+			while(resultSet.next()) {
+				comunidades.add(resultSet.getString("NOMBRE_COMUNIDAD"));
+			}
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw e;
+			
+		}finally {
+			if (null != preparedStatement) {
+				try {
+					preparedStatement.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				
+				}
+			}
+		}
+		
+		return comunidades;
+	}
+	
+	public ArrayList<String> sacarRango(Connection connection, ArrayList<String> rangos) throws SQLException {
+		ResultSet resultSet = null;
+		PreparedStatement preparedStatement = null;
+		
+		try {
+			
+			preparedStatement = connection.prepareStatement("SELECT RANGO FROM PORCENTAJE_VOTACION_RANGO WHERE ES_MAYOREDAD = '1'");
+			
+			resultSet = preparedStatement.executeQuery();
+			
+			while(resultSet.next()) {
+				rangos.add(resultSet.getString("RANGO"));
+			}
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw e;
+			
+		}finally {
+			if (null != preparedStatement) {
+				try {
+					preparedStatement.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				
+				}
+			}
+		}
+		
+		return rangos;
+	}
+	
+	public void votacionComunidades(Connection connection, String rango, String comunidad) throws SQLException {
 		ResultSet resultSet = null;
 		PreparedStatement preparedStatement = null;
 		int porcentajeVoto, porcentajeRango, numVotosFinal, totalHabitantes;
@@ -54,24 +144,22 @@ public class controlador implements ActionListener{
 			
 			preparedStatement = connection.prepareStatement("SELECT ? FROM PORCENTAJES_RANGOEDAD WHERE NOMBRE_COMUNIDAD = ?");
 			preparedStatement.setString(1, rango);
-			preparedStatement.setString(2, "Andalucia");
+			preparedStatement.setString(2, comunidad);
 			
 			resultSet = preparedStatement.executeQuery();
 			
+			while(resultSet.next()) {
 			porcentajeVoto = resultSet.getInt(rango);
 			
 			porcentajeRango = votacionRango(connection, rango);
 			
 			
-			//Cambiar el String andalucia por una variable que cambie de comunidad
-			totalHabitantes = habitantesComunidad(connection, "Andalucia");
+			totalHabitantes = habitantesComunidad(connection, comunidad);
 			
-			porcentajeVoto = (totalHabitantes * porcentajeVoto)/100;
-			
-			numVotosFinal = (porcentajeVoto * porcentajeRango)/100;
+			numVotosFinal = generarNumVotos(porcentajeVoto, porcentajeRango, totalHabitantes);
 			
 			votacion(numVotosFinal);
-					
+			}		
 		}catch(SQLException e) {
 			e.printStackTrace();
 			throw e;
@@ -85,6 +173,15 @@ public class controlador implements ActionListener{
 					}
 				}
 		}
+	}
+
+	public int generarNumVotos(int porcentajeVoto, int porcentajeRango, int totalHabitantes) {
+		int numVotosFinal;
+		porcentajeVoto = (totalHabitantes * porcentajeVoto)/100;
+		
+		numVotosFinal = (porcentajeVoto * porcentajeRango)/100;
+		
+		return numVotosFinal;
 	}
 	
 	public int habitantesComunidad(Connection connection, String comunidad) throws SQLException {

@@ -5,13 +5,16 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import controlador.controlador;
+
 import javax.swing.JButton;
 
-public class vista extends JFrame {
+public class Vista extends JFrame {
 
 	private JPanel contentPane;
 
-	public JButton btnNewButton;
+	public JButton botonInicio;
 	/**
 	 * Launch the application.
 	 */
@@ -19,8 +22,9 @@ public class vista extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					vista frame = new vista();
+					Vista frame = new Vista();
 					frame.setVisible(true);
+					controlador controlador = new controlador(frame);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -31,7 +35,7 @@ public class vista extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public vista() {
+	public Vista() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 724, 491);
 		contentPane = new JPanel();
@@ -40,8 +44,8 @@ public class vista extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		btnNewButton = new JButton("New button");
-		btnNewButton.setBounds(130, 122, 85, 21);
-		contentPane.add(btnNewButton);
+		botonInicio = new JButton("New button");
+		botonInicio.setBounds(130, 122, 85, 21);
+		contentPane.add(botonInicio);
 	}
 }
