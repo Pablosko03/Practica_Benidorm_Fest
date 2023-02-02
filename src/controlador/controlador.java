@@ -62,7 +62,9 @@ public class controlador implements ActionListener{
 					comunidad = comunidades.get(i);
 					rango = rangos.get(j);
 					
-					votacionComunidades(connection, rango, comunidad);
+					String consulta = "SELECT " + rango + " FROM PORCENTAJES_RANGOEDAD WHERE NOMBRE_COMUNIDAD = ?";
+					
+					votacionComunidades(connection, consulta, rango, comunidad);
 				}
 			}
 		} catch (SQLException e) {
@@ -135,30 +137,30 @@ public class controlador implements ActionListener{
 		return rangos;
 	}
 	
-	public void votacionComunidades(Connection connection, String rango, String comunidad) throws SQLException {
+	public void votacionComunidades(Connection connection, String consulta, String rango, String comunidad) throws SQLException {
 		ResultSet resultSet = null;
 		PreparedStatement preparedStatement = null;
-		int porcentajeVoto, porcentajeRango, numVotosFinal, totalHabitantes;
+		int porcentajeVoto, numVotosFinal, totalHabitantes;
+		double porcentajeRango;
 		
 		try {
 			
-			preparedStatement = connection.prepareStatement("SELECT ? FROM PORCENTAJES_RANGOEDAD WHERE NOMBRE_COMUNIDAD = ?");
-			preparedStatement.setString(1, rango);
-			preparedStatement.setString(2, comunidad);
+			preparedStatement = connection.prepareStatement(consulta);
+			preparedStatement.setString(1, comunidad);
 			
 			resultSet = preparedStatement.executeQuery();
 			
 			while(resultSet.next()) {
-			porcentajeVoto = resultSet.getInt(rango);
+				
+				porcentajeVoto = resultSet.getInt(rango);
+
+				porcentajeRango = votacionRango(connection, rango);
+				
+				totalHabitantes = habitantesComunidad(connection, comunidad);
 			
-			porcentajeRango = votacionRango(connection, rango);
+				numVotosFinal = generarNumVotos(porcentajeVoto, porcentajeRango, totalHabitantes);
 			
-			
-			totalHabitantes = habitantesComunidad(connection, comunidad);
-			
-			numVotosFinal = generarNumVotos(porcentajeVoto, porcentajeRango, totalHabitantes);
-			
-			votacion(numVotosFinal);
+				votacion(numVotosFinal, rango, comunidad);
 			}		
 		}catch(SQLException e) {
 			e.printStackTrace();
@@ -175,11 +177,11 @@ public class controlador implements ActionListener{
 		}
 	}
 
-	public int generarNumVotos(int porcentajeVoto, int porcentajeRango, int totalHabitantes) {
+	public int generarNumVotos(int porcentajeVoto, double porcentajeRango, int totalHabitantes) {
 		int numVotosFinal;
 		porcentajeVoto = (totalHabitantes * porcentajeVoto)/100;
 		
-		numVotosFinal = (porcentajeVoto * porcentajeRango)/100;
+		numVotosFinal = (int) ((porcentajeVoto * porcentajeRango)/100);
 		
 		return numVotosFinal;
 	}
@@ -187,7 +189,7 @@ public class controlador implements ActionListener{
 	public int habitantesComunidad(Connection connection, String comunidad) throws SQLException {
 		ResultSet resultSet = null;
 		PreparedStatement preparedStatement = null;
-		int totalHabitantes;
+		int totalHabitantes = 0;
 		
 		try {
 			
@@ -196,8 +198,9 @@ public class controlador implements ActionListener{
 			
 			resultSet = preparedStatement.executeQuery();
 			
+			while(resultSet.next()) {
 			totalHabitantes = resultSet.getInt("TOTAL_HABITANTES");
-			
+			}
 		}catch(SQLException e) {
 			e.printStackTrace();
 			throw e;
@@ -205,10 +208,10 @@ public class controlador implements ActionListener{
 		return totalHabitantes;
 	}
 	
-	public int votacionRango(Connection connection, String rango) throws SQLException{
+	public double votacionRango(Connection connection, String rango) throws SQLException{
 		ResultSet resultSet = null;
 		PreparedStatement preparedStatement = null;
-		int porcentajeVoto;
+		double porcentajeVoto = 0;
 		
 		try {
 			
@@ -217,7 +220,10 @@ public class controlador implements ActionListener{
 			
 			resultSet = preparedStatement.executeQuery();
 			
-			porcentajeVoto = resultSet.getInt(rango);
+			while(resultSet.next()) {
+			porcentajeVoto = resultSet.getDouble("PORCENTAJE");
+			
+			}
 			
 		}catch(SQLException e) {
 			e.printStackTrace();
@@ -227,16 +233,43 @@ public class controlador implements ActionListener{
 		return porcentajeVoto;
 	}
 
-	public void votacion(int numVotos) {
+	public void votacion(int numVotos, String rango, String comunidad) {
 		//Repetimos el for segun el numero de votos por porcentaje de rango
-		String rango = "";
+		System.out.println(numVotos);
 		for(int i = 0; i< numVotos; i++) {
 			//Creacion del hilo de prueba
 			Votacion hilo = new Votacion(rango);
+			hilo.start();
 		
 			//Recuperamos el voto que ha salido del numero random que calcula el hilo
 			int voto = hilo.getVoto();
+			
+			System.out.println(voto);
+			
 		}
+		System.out.println("Votacion del  "+rango +" de "+comunidad+" finalizada");
+	}
+	
+	public void updateVoto(Connection connection, int voto, String comunidad, String rango) throws SQLException {
+		ResultSet resultSet = null;
+		PreparedStatement preparedStatement = null;
+		
+		try {
+			
+			preparedStatement = connection.prepareStatement("");
+			
+			resultSet = preparedStatement.executeQuery();
+			
+			while(resultSet.next()) {
+			
+			
+			}
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw e;
+		}
+		
 	}
 
 	public static Connection createConnection() throws ClassNotFoundException, SQLException, IOException {
