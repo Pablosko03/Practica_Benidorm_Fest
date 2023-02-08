@@ -37,6 +37,7 @@ public class Votacion extends Thread{
 			}else if(random >= 96 && random <= 100) {
 				voto = 10;
 			}
+			
 		}else if(rango.equals("RANGO_26_40")) {
 			if(random >= 0 && random <= 14) {
 				voto = 1;
@@ -59,6 +60,7 @@ public class Votacion extends Thread{
 			}else if(random >= 91 && random <= 100) {
 				voto = 10;
 			}
+
 		}else if(rango.equals("RANGO_41_65")) {
 			if(random >= 0 && random <= 5) {
 				voto = 1;
@@ -81,6 +83,7 @@ public class Votacion extends Thread{
 			}else if(random >= 89 && random <= 100) {
 				voto = 10;
 			}
+
 		}else if(rango.equals("RANGO_MAS_66")) {
 			if(random >= 0 && random <= 3) {
 				voto = 1;
@@ -103,6 +106,7 @@ public class Votacion extends Thread{
 			}else if(random >= 92 && random <= 100) {
 				voto = 10;
 			}
+
 		}
 		
 	}
