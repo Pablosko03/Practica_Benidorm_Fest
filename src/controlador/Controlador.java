@@ -50,28 +50,7 @@ public class Controlador implements ActionListener, MouseListener{
 				Vista.cargando.setVisible(false);
 				Vista.imagen.setVisible(false);
 				procesarComunidadVoto(connection);
-				Vista.seleccionFiltro.setVisible(true);
-				Vista.comboBox.setVisible(true);
-				Vista.panelTop1.setVisible(true);
-				Vista.panelPosicionTop1.setVisible(true);
-				Vista.panelTop2.setVisible(true);
-				Vista.panelPosicionTop2.setVisible(true);
-				Vista.panelTop3.setVisible(true);
-				Vista.panelPosicionTop3.setVisible(true);
-				Vista.panelTop4.setVisible(true);
-				Vista.panelPosicionTop4.setVisible(true);
-				Vista.panelTop5.setVisible(true);
-				Vista.panelPosicionTop5.setVisible(true);
-				Vista.panelTop6.setVisible(true);
-				Vista.panelPosicionTop6.setVisible(true);
-				Vista.panelTop7.setVisible(true);
-				Vista.panelPosicionTop7.setVisible(true);
-				Vista.panelTop8.setVisible(true);
-				Vista.panelPosicionTop8.setVisible(true);
-				Vista.panelTop9.setVisible(true);
-				Vista.panelPosicionTop9.setVisible(true);
-				Vista.panelTop10.setVisible(true);
-				Vista.panelPosicionTop10.setVisible(true);
+				mostrarGanadores();
 //				votacionAndalucia(connection, "");
 				
 			}
@@ -93,6 +72,31 @@ public class Controlador implements ActionListener, MouseListener{
 			e1.printStackTrace();
 		}
 		
+	}
+
+	private void mostrarGanadores() {
+		Vista.seleccionFiltro.setVisible(true);
+		Vista.comboBox.setVisible(true);
+		Vista.panelTop1.setVisible(true);
+		Vista.panelPosicionTop1.setVisible(true);
+		Vista.panelTop2.setVisible(true);
+		Vista.panelPosicionTop2.setVisible(true);
+		Vista.panelTop3.setVisible(true);
+		Vista.panelPosicionTop3.setVisible(true);
+		Vista.panelTop4.setVisible(true);
+		Vista.panelPosicionTop4.setVisible(true);
+		Vista.panelTop5.setVisible(true);
+		Vista.panelPosicionTop5.setVisible(true);
+		Vista.panelTop6.setVisible(true);
+		Vista.panelPosicionTop6.setVisible(true);
+		Vista.panelTop7.setVisible(true);
+		Vista.panelPosicionTop7.setVisible(true);
+		Vista.panelTop8.setVisible(true);
+		Vista.panelPosicionTop8.setVisible(true);
+		Vista.panelTop9.setVisible(true);
+		Vista.panelPosicionTop9.setVisible(true);
+		Vista.panelTop10.setVisible(true);
+		Vista.panelPosicionTop10.setVisible(true);
 	}
 	
 	
