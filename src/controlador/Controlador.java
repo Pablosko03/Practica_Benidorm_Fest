@@ -2,6 +2,9 @@ package controlador;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
@@ -12,30 +15,77 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Properties;
 
+import javax.swing.ImageIcon;
+import javax.swing.JProgressBar;
+
 import modelo.*;
 import vista.Vista;
 
-public class controlador implements ActionListener{
+public class Controlador implements ActionListener, MouseListener{
 
 	Vista Vista = new Vista();
+	private int votosTotales;
+	private int progreso;
+	private int avanza;
 	
-	public controlador(Vista Vista) {
+	
+	public Controlador(Vista Vista) {
 		this.Vista = Vista;
 		this.Vista.botonInicio.addActionListener(this);
+		this.Vista.comboBox.addActionListener(this);
+		this.Vista.comboComunidades.addActionListener(this);
+
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 		int numVotos = 0;
-		controlador helper = new controlador(Vista);
+		Controlador helper = new Controlador(Vista);
 		try {
-			Connection connection = helper.createConnection();
-			
 			if(e.getSource() == this.Vista.botonInicio) {
-				
+				Connection connection = helper.createConnection();
+				Vista.botonInicio.setVisible(false);
+				Vista.progressBar.setVisible(false);
+				Vista.cargando.setVisible(false);
+				Vista.imagen.setVisible(false);
 				procesarComunidadVoto(connection);
+				Vista.seleccionFiltro.setVisible(true);
+				Vista.comboBox.setVisible(true);
+				Vista.panelTop1.setVisible(true);
+				Vista.panelPosicionTop1.setVisible(true);
+				Vista.panelTop2.setVisible(true);
+				Vista.panelPosicionTop2.setVisible(true);
+				Vista.panelTop3.setVisible(true);
+				Vista.panelPosicionTop3.setVisible(true);
+				Vista.panelTop4.setVisible(true);
+				Vista.panelPosicionTop4.setVisible(true);
+				Vista.panelTop5.setVisible(true);
+				Vista.panelPosicionTop5.setVisible(true);
+				Vista.panelTop6.setVisible(true);
+				Vista.panelPosicionTop6.setVisible(true);
+				Vista.panelTop7.setVisible(true);
+				Vista.panelPosicionTop7.setVisible(true);
+				Vista.panelTop8.setVisible(true);
+				Vista.panelPosicionTop8.setVisible(true);
+				Vista.panelTop9.setVisible(true);
+				Vista.panelPosicionTop9.setVisible(true);
+				Vista.panelTop10.setVisible(true);
+				Vista.panelPosicionTop10.setVisible(true);
 //				votacionAndalucia(connection, "");
+				
+			}
+			if(e.getSource() == Vista.comboBox) {
+				String filtro = (String)Vista.comboBox.getSelectedItem();
+				if(filtro.equals("Comunidad")) {
+					Vista.comboComunidades.setVisible(true);
+				}else if(filtro.equals("Nacional")) {
+					Vista.comboComunidades.setVisible(false);
+				}else if(filtro.equals("Edad")) {
+					Vista.comboComunidades.setVisible(false);
+				}else {
+					
+				}
 			}
 			
 		} catch (ClassNotFoundException | SQLException | IOException e1) {
@@ -44,6 +94,8 @@ public class controlador implements ActionListener{
 		}
 		
 	}
+	
+	
 	
 	public void procesarComunidadVoto(Connection connection) {
 		ArrayList<String> comunidades = new ArrayList<String>();
@@ -246,8 +298,8 @@ public class controlador implements ActionListener{
 			
 			hilo.start();
 			try {
-				hilo.sleep(500);
-			} catch (InterruptedException e1) {
+				//hilo.sleep(500);
+			} catch (Exception e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
@@ -262,9 +314,11 @@ public class controlador implements ActionListener{
 			//Recuperamos el voto que ha salido del numero random que calcula el hilo
 			voto = hilo.getVoto();
 			System.out.println(voto);
+			
+			}
 		}
 
-	}
+	
 	
 	public void updateVoto(Connection connection, int voto, String comunidad, String rango) throws SQLException {
 		PreparedStatement preparedStatement = null;
@@ -310,5 +364,34 @@ public class controlador implements ActionListener{
 		}
 
 		return censoHabitantes;
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 }
